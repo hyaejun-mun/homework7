@@ -271,8 +271,8 @@ int deleteFirst(headNode *h)
     }
     // 리스트 처음 노드를 저장하고, h를 다음 노드를 가리키게 함.
     listNode *p = h->first;
-    p = h->first;
     h->first = p->rlink;
+    h->first->llink = NULL;
     free(p);
     return 0;
 }
@@ -370,7 +370,7 @@ int deleteNode(headNode *h, int key)
             {
                 deleteFirst(h);
             }
-            else if (p == NULL) // 마지막 노드인 경우
+            else if (p->rlink == NULL) // 마지막 노드인 경우
             {
                 deleteLast(h);
             }
