@@ -14,14 +14,14 @@
 
 /* 필요한 헤더파일 추가 if necessary */
 
-typedef struct Node
+typedef struct Node // 좌우 노드를 가리키도록 설정 -> 양방향 접근 가능.
 {
     int key;
     struct Node *llink;
     struct Node *rlink;
 } listNode;
 
-typedef struct Head
+typedef struct Head // 리스트의 시작을 의미함.
 {
     struct Node *first;
 } headNode;
@@ -29,7 +29,7 @@ typedef struct Head
 /* 함수 리스트 */
 
 /* note: initialize는 이중포인터를 매개변수로 받음 */
-int initialize(headNode **h);
+int initialize(headNode **h); // 이중포인터인 이유:
 
 /* note: freeList는 싱글포인터를 매개변수로 받음
         - initialize와 왜 다른지 이해할 것
@@ -129,12 +129,25 @@ int main()
 
 int initialize(headNode **h)
 {
-
+    if (*h != NULL) // 새로 시작해야 하므로, 비어 있지 않으면 비워 주어야 함.
+        freelist(*h);
+    // 'h가 가리키는 곳'에 동적 할당함.
+    *h = (headNode *)malloc(sizeof(headNode));
+    (*h)->first = NULL;
     return 1;
 }
 
-int freeList(headNode *h)
-{
+int freeList(headNode *h)   // 동적할당된 부분은 h가 가리키는 곳이므로
+{                           // h가 가리키는 곳까지만 와도 모두 해제 가능함.
+    listNode *p = h->first; // 먼저 동적할당된 노드들부터 할당 해제해 주어야 함.
+    listNode *prev = NULL;
+    while (p != NULL) // 현재 p는 첫 번째 원소를 가리키는 중.
+    {
+        prev = p;
+        p = p->link;
+        free(prev); // 하나씩 지나가면서 해제해줌.
+    }
+    free(h); // h도 동적할당되었으므로, 해제해줌.
     return 0;
 }
 
