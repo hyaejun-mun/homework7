@@ -308,7 +308,43 @@ int invertList(headNode *h)
 /* 리스트를 검색하여, 입력받은 key보다 큰값이 나오는 노드 바로 앞에 삽입 */
 int insertNode(headNode *h, int key)
 {
-
+    // 리스트가 비었는지 확인
+    if (h->first == NULL)
+    {
+        h->first = input;
+        return 0;
+    }
+    // 삽입될 노드 생성
+    listNode *input = (listNode *)malloc(listNode);
+    input->key = key;
+    input->rlink = NULL;
+    input->llink = NULL;
+    // 리스트를 확인하는 포인터
+    listNode *p = h->first;
+    while (p != NULL)
+    {
+        if (p->key > key) // 리스트 삽입 조건
+        {
+            if (p == h->first) // 리스트의 처음인지 확인
+                               // 처음이면, 처음 노드 앞에 삽입
+            {
+                input->rlink = h->first;
+                h->first->llink = input;
+                h->first = input;
+            }
+            else // 처음 아니면, 노드 2개 사이에 끼워넣음
+            {
+                input->rlink = p;
+                input->llink = p->llink;
+                p->llink->rlink = input;
+                p->llink = input;
+            }
+            return 0;
+        }
+        p = p->rlink;
+    }
+    // 다 확인했어도 여전히 작으면, 마지막에 삽입
+    insertLast(h, key);
     return 0;
 }
 
@@ -317,6 +353,37 @@ int insertNode(headNode *h, int key)
  */
 int deleteNode(headNode *h, int key)
 {
-
+    // 리스트가 비어 있을 경우
+    if (h->first == NULL)
+    {
+        printf("List is empty.\n");
+        return 1;
+    }
+    // 리스트를 탐색하는 포인터
+    listNode *p = h->first;
+    while (p != NULL)
+    {
+        if (p->key == key) // 조건 충족할 경우
+        {
+            if (p->key == h->first) // 처음 노드인 경우
+            {
+                deleteFirst(h, key);
+            }
+            else if (p->key == NULL) // 마지막 노드인 경우
+            {
+                deleteLast(h, key);
+            }
+            else // 중간 노드인 경우
+            {
+                p->llink->rlink = p->rlink;
+                p->rlink->llink = p->llink;
+                free(p);
+            }
+            return 1;
+        }
+        p = p->rlink; // 다음 노드로 이동
+    }
+    // 모두 key와 다를 경우
+    printf("There is No key.\n");
     return 1;
 }
