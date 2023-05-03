@@ -29,12 +29,12 @@ typedef struct Head // 리스트의 시작을 의미함.
 /* 함수 리스트 */
 
 /* note: initialize는 이중포인터를 매개변수로 받음 */
-int initialize(headNode **h); // 이중포인터인 이유:
+int initialize(headNode **h); // 이중포인터인 이유: 시작 중, *h 값을 변경할 수 있기 때문!
 
 /* note: freeList는 싱글포인터를 매개변수로 받음
         - initialize와 왜 다른지 이해할 것
         - 이중 포인터를 매개변수로 받아도 해제할 수 있을 것 */
-int freeList(headNode *h);
+int freeList(headNode *h); // *h의 값이 변경되지 않기 때문이다!!
 
 int insertNode(headNode *h, int key);
 int insertLast(headNode *h, int key);
@@ -130,7 +130,7 @@ int main()
 int initialize(headNode **h)
 {
     if (*h != NULL) // 새로 시작해야 하므로, 비어 있지 않으면 비워 주어야 함.
-        freelist(*h);
+        freeList(*h);
     // 'h가 가리키는 곳'에 동적 할당함.
     *h = (headNode *)malloc(sizeof(headNode));
     (*h)->first = NULL;
@@ -144,7 +144,7 @@ int freeList(headNode *h)   // 동적할당된 부분은 h가 가리키는 곳�
     while (p != NULL) // 현재 p는 첫 번째 원소를 가리키는 중.
     {
         prev = p;
-        p = p->link;
+        p = p->rlink;
         free(prev); // 하나씩 지나가면서 해제해줌.
     }
     free(h); // h도 동적할당되었으므로, 해제해줌.
@@ -209,7 +209,7 @@ int insertLast(headNode *h, int key)
 int deleteLast(headNode *h)
 {
     // 리스트가 이미 비어 있으면, 실행할 수 없다.
-    if (*h == NULL)
+    if (h->first == NULL)
     {
         printf("List is empty.\n");
         return 0;
@@ -239,6 +239,21 @@ int deleteLast(headNode *h)
  */
 int insertFirst(headNode *h, int key)
 {
+    // 삽입할 노드 동적할당.
+    listNode *input = (listNode *)malloc(sizeof(listNode));
+    input->key = key;
+    input->rlink = NULL;
+    input->llink = NULL;
+    // 리스트가 비었으면, 그냥 앞에 붙임.
+    if (h->first == NULL)
+    {
+        h->first = input;
+        return 0;
+    }
+    // 그게 아니면, 1번째 원소의 rlink를 조절하여 할당.
+    input->rlink = h->first;
+    h->first->llink = input;
+    h->first = input;
     return 0;
 }
 
@@ -247,7 +262,17 @@ int insertFirst(headNode *h, int key)
  */
 int deleteFirst(headNode *h)
 {
-
+    // 리스트가 비었으면, 실행하지 않음
+    if (h->first == NULL)
+    {
+        printf("List is empty.\n");
+        return 0;
+    }
+    // 리스트 처음 노드를 저장하고, h를 다음 노드를 가리키게 함.
+    listNode *p = h->first;
+    p = h->first;
+    h->first = p->rlink;
+    free(p);
     return 0;
 }
 
@@ -256,11 +281,31 @@ int deleteFirst(headNode *h)
  */
 int invertList(headNode *h)
 {
-
+    // 리스트가 비었으면, 실행하지 않는다.
+    if (h->first == NULL)
+    {
+        printf("List is empty.\n");
+        return 0;
+    }
+    // 순서 교환을 위해 필요한 3개의 포인터를 할당한다.
+    listNode *p = h->first;
+    listNode *prev = NULL;
+    listNode *change = NULL;
+    // 끝까지 이동하면서, rlink와 llink의 값을 변경해준다.
+    while (p != NULL)
+    {
+        prev = change;
+        change = p;
+        p = p->rlink;
+        change->rlink = prev;
+        change->llink = p;
+    }
+    // 다 바꿨으면, change가 마지막 원소를 가리키므로 h->first가 가리키게 한다.
+    h->first = change;
     return 0;
 }
 
-/* 由ъ뒪�몃� 寃��됲븯��, �낅젰諛쏆� key蹂대떎 �곌컪�� �섏삤�� �몃뱶 諛붾줈 �욎뿉 �쎌엯 */
+/* 리스트를 검색하여, 입력받은 key보다 큰값이 나오는 노드 바로 앞에 삽입 */
 int insertNode(headNode *h, int key)
 {
 
