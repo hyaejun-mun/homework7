@@ -54,6 +54,7 @@ int main()
 
     do
     {
+        printf("[----- [hyaejun-mun] [2019015035] -----]\n");
         printf("----------------------------------------------------------------\n");
         printf("                     Doubly Linked  List                        \n");
         printf("----------------------------------------------------------------\n");
@@ -308,17 +309,17 @@ int invertList(headNode *h)
 /* 리스트를 검색하여, 입력받은 key보다 큰값이 나오는 노드 바로 앞에 삽입 */
 int insertNode(headNode *h, int key)
 {
+    // 삽입될 노드 생성
+    listNode *input = (listNode *)malloc(sizeof(listNode));
+    input->key = key;
+    input->rlink = NULL;
+    input->llink = NULL;
     // 리스트가 비었는지 확인
     if (h->first == NULL)
     {
         h->first = input;
         return 0;
     }
-    // 삽입될 노드 생성
-    listNode *input = (listNode *)malloc(listNode);
-    input->key = key;
-    input->rlink = NULL;
-    input->llink = NULL;
     // 리스트를 확인하는 포인터
     listNode *p = h->first;
     while (p != NULL)
@@ -365,13 +366,13 @@ int deleteNode(headNode *h, int key)
     {
         if (p->key == key) // 조건 충족할 경우
         {
-            if (p->key == h->first) // 처음 노드인 경우
+            if (p == h->first) // 처음 노드인 경우
             {
-                deleteFirst(h, key);
+                deleteFirst(h);
             }
-            else if (p->key == NULL) // 마지막 노드인 경우
+            else if (p == NULL) // 마지막 노드인 경우
             {
-                deleteLast(h, key);
+                deleteLast(h);
             }
             else // 중간 노드인 경우
             {
