@@ -181,7 +181,25 @@ void printList(headNode *h)
  */
 int insertLast(headNode *h, int key)
 {
-
+    // key를 가지는 노드를 동적할당한다.
+    listNode *input = (listNode *)malloc(sizeof(listNode));
+    input->key = key;
+    input->rlink = NULL;
+    input->llink = NULL;
+    // h가 비어 있으면, 그냥 앞에 추가한다.
+    if (h->first == NULL)
+    {
+        h->first = input;
+        return 0;
+    }
+    // 마지막으로 이동하여, 서로 연결해준다.
+    listNode *p = h->first;
+    while (p->rlink != NULL)
+    {
+        p = p->rlink;
+    }
+    p->rlink = input;
+    input->llink = p;
     return 0;
 }
 
@@ -190,7 +208,29 @@ int insertLast(headNode *h, int key)
  */
 int deleteLast(headNode *h)
 {
-
+    // 리스트가 이미 비어 있으면, 실행할 수 없다.
+    if (*h == NULL)
+    {
+        printf("List is empty.\n");
+        return 0;
+    }
+    listNode *p = h->first;
+    listNode *prev = NULL;
+    // 리스트에 노드가 하나만 있으면, 그것을 삭제한다.
+    if (p->rlink == NULL)
+    {
+        h->first = NULL;
+        free(p);
+        return 0;
+    }
+    // 리스트의 끝 노드까지 이동한 후, 할당 해제해 준다.
+    while (p->rlink != NULL)
+    {
+        prev = p;
+        p = p->rlink;
+    }
+    prev->rlink = NULL;
+    free(p);
     return 0;
 }
 
